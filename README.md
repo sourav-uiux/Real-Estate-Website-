@@ -32,5 +32,6 @@ This repository includes an automated GitHub Actions workflow at `.github/workfl
    git push -u origin main
    ```
 2. In your GitHub repository, open **Settings → Pages**.
-3. Under **Build and deployment**, set **Source** to **GitHub Actions**.
-4. The `Deploy to GitHub Pages` workflow runs automatically on every push to `main` (or manually via the **Actions** tab) and publishes `./dist`.
+3. Under **Build and deployment**, set **Source** to **GitHub Actions** (do **not** use *Deploy from a branch → `main` / `(root)`*, as GitHub Pages would serve the uncompiled root `index.html` pointing to `/src/main.tsx` and render a blank page).
+4. Open the **Actions** tab to verify the `Deploy to GitHub Pages` workflow completes cleanly and visit the published `github.io` URL.
+

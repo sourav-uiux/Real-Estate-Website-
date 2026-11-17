@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { Eye, EyeOff, RotateCcw, Sun, Moon } from 'lucide-react';
-import { JOURNEY_CHAPTERS } from '../data/residenceData';
+import { IMAGES, JOURNEY_CHAPTERS } from '../data/residenceData';
 import { CAMERA_PRESETS, dampScalar } from '../utils/cameraChoreography';
 import { createVillaMaterials } from '../three/villaMaterials';
 import { buildVillaWorld } from '../three/villaGeometry';
@@ -19,14 +19,30 @@ const _targetPos = new THREE.Vector3();
 const _targetLook = new THREE.Vector3();
 
 function detectSoftwareWebGL(): boolean {
-  const probeCanvas = document.createElement('canvas');
-  const gl = probeCanvas.getContext('webgl2');
-  if (!gl) return true;
-  const ext = gl.getExtension('WEBGL_debug_renderer_info');
-  const param = ext ? ext.UNMASKED_RENDERER_WEBGL : gl.RENDERER;
-  const gpu = String(gl.getParameter(param));
-  gl.getExtension('WEBGL_lose_context')?.loseContext();
-  return /SwiftShader|llvmpipe|softpipe|Software|Basic Render/i.test(gpu);
+  try {
+    const probeCanvas = document.createElement('canvas');
+    const gl = probeCanvas.getContext('webgl2') || probeCanvas.getContext('webgl');
+    if (!gl) return true;
+    const ext = gl.getExtension('WEBGL_debug_renderer_info');
+    const param = ext ? ext.UNMASKED_RENDERER_WEBGL : gl.RENDERER;
+    const gpu = String(gl.getParameter(param));
+    gl.getExtension('WEBGL_lose_context')?.loseContext();
+    return /SwiftShader|llvmpipe|softpipe|Software|Basic Render/i.test(gpu);
+  } catch {
+    return true;
+  }
+}
+
+function hasWebGLContext(): boolean {
+  try {
+    const probeCanvas = document.createElement('canvas');
+    const gl = probeCanvas.getContext('webgl2') || probeCanvas.getContext('webgl');
+    if (!gl) return false;
+    gl.getExtension('WEBGL_lose_context')?.loseContext();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function VillaThreeScene({
@@ -88,14 +104,26 @@ export function VillaThreeScene({
     const mountEl = containerRef.current;
     if (!mountEl) return;
 
+    if (!hasWebGLContext()) {
+      setContextLost(true);
+      return;
+    }
+
     const isSoftwareGl = detectSoftwareWebGL();
     const width = mountEl.clientWidth || 1280;
     const height = mountEl.clientHeight || 720;
 
-    const renderer = new THREE.WebGLRenderer({
-      antialias: !isSoftwareGl,
-      powerPreference: 'high-performance',
-    });
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        antialias: !isSoftwareGl,
+        powerPreference: 'high-performance',
+      });
+    } catch {
+      setContextLost(true);
+      return;
+    }
+
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.08;
@@ -235,7 +263,11 @@ export function VillaThreeScene({
     let disposed = false;
 
     const afterDraw = (cb: () => void) => {
-      const gl = renderer.getContext() as WebGL2RenderingContext;
+      const gl = renderer.getContext() as WebGL2RenderingContext | null;
+      if (!gl || typeof gl.fenceSync !== 'function') {
+        frameId = window.setTimeout(cb, 80);
+        return;
+      }
       const sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
       gl.flush();
       const poll = () => {
@@ -400,13 +432,24 @@ export function VillaThreeScene({
 
       {/* Fallback when WebGL context is unavailable */}
       {contextLost && (
-        <div className="absolute inset-0 flex items-center justify-center bg-[#171614] text-[#F7F4EF] p-8 text-center">
-          <div className="max-w-md space-y-3">
-            <p className="font-serif text-3xl">3D Pavilion View Paused</p>
-            <p className="text-sm text-[#D8D0C5]">
-              Graphics context is restoring. Scroll below to explore interior architectural photography.
-            </p>
-          </div>
+        <div className="absolute inset-0 bg-[#171614] text-[#F7F4EF]">
+          <img
+            src={
+              activeChapterIndex === 0
+                ? IMAGES.heroAerial
+                : activeChapterIndex === 1 || activeChapterIndex === 2
+                  ? IMAGES.exteriorArrival
+                  : activeChapterIndex === 3
+                    ? IMAGES.interiorLiving
+                    : IMAGES.detailStonePool
+            }
+            alt={currentChapter.title}
+            className="w-full h-full object-cover opacity-80"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 bg-gradient-to-t from-[#171614]/80 via-transparent to-[#171614]/40"
+          />
         </div>
       )}
 

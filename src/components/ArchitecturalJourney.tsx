@@ -7,6 +7,7 @@ import {
   IMAGES,
 } from '../data/residenceData';
 import { VillaThreeScene } from './VillaThreeScene';
+import { ErrorBoundary } from './ErrorBoundary';
 
 export function ArchitecturalJourney() {
   const [activeChapterIdx, setActiveChapterIdx] = useState(0);
@@ -74,10 +75,12 @@ export function ArchitecturalJourney() {
       </div>
 
       {/* Interactive Three.js 3D Architectural Estate Viewport */}
-      <VillaThreeScene
-        activeChapterIndex={activeChapterIdx}
-        onSelectChapter={setActiveChapterIdx}
-      />
+      <ErrorBoundary>
+        <VillaThreeScene
+          activeChapterIndex={activeChapterIdx}
+          onSelectChapter={setActiveChapterIdx}
+        />
+      </ErrorBoundary>
 
       {/* Five Chapters Strip — Continuous Narrative Synchronization */}
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-16 md:py-24">
