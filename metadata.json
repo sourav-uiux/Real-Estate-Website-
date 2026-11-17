@@ -1,0 +1,8 @@
+{
+  "name": "Villa Vérone — Cap Ferrat",
+  "description": "An architectural cliffside residence and interactive digital experience on Saint-Jean-Cap-Ferrat, Côte d'Azur.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
