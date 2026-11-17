@@ -71,12 +71,18 @@ export interface GalleryItem {
   imageAlt: string;
 }
 
+import heroAerialImg from '../assets/images/villa_hero_aerial_1794894770347.jpg';
+import exteriorArrivalImg from '../assets/images/villa_exterior_arrival_1794894770675.jpg';
+import interiorLivingImg from '../assets/images/villa_interior_living_1794894772275.jpg';
+import interiorSuiteImg from '../assets/images/villa_interior_suite_1794894771650.jpg';
+import detailStonePoolImg from '../assets/images/villa_detail_stone_pool_1794894772624.jpg';
+
 export const IMAGES = {
-  heroAerial: '/src/assets/images/villa_hero_aerial_1794894770347.jpg',
-  exteriorArrival: '/src/assets/images/villa_exterior_arrival_1794894770675.jpg',
-  interiorLiving: '/src/assets/images/villa_interior_living_1794894772275.jpg',
-  interiorSuite: '/src/assets/images/villa_interior_suite_1794894771650.jpg',
-  detailStonePool: '/src/assets/images/villa_detail_stone_pool_1794894772624.jpg',
+  heroAerial: heroAerialImg,
+  exteriorArrival: exteriorArrivalImg,
+  interiorLiving: interiorLivingImg,
+  interiorSuite: interiorSuiteImg,
+  detailStonePool: detailStonePoolImg,
 } as const;
 
 export const JOURNEY_CHAPTERS: JourneyChapter[] = [
