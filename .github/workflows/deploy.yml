@@ -30,16 +30,16 @@ jobs:
       - name: Install dependencies
         run: |
           if [ -f package-lock.json ]; then
-            npm ci
+            npm ci --legacy-peer-deps
           else
-            npm install
+            npm install --legacy-peer-deps
           fi
 
       - name: Type-check
         run: npm run lint
 
       - name: Run unit tests
-        run: npx tsx --test src/utils/cameraChoreography.test.ts src/utils/inquiryValidation.test.ts
+        run: ./node_modules/.bin/tsx --test src/utils/cameraChoreography.test.ts src/utils/inquiryValidation.test.ts
 
       - name: Build static site
         run: npm run build
